@@ -11,7 +11,6 @@ const handleAdd = async (title: string | undefined) => {
     if (!title || title.trim() === "")
       throw new ValidationError("Invalid Input");
     const data = await loadTasks();
-    4;
     const task = { id: Date.now().toString(), task: title, completed: false };
     data.push(task);
     await saveTasks(data);
@@ -38,8 +37,9 @@ async function handleComplete(id: string | undefined) {
 }
 async function handleRemove(id: string | undefined) {
   const data = await loadTasks();
+  let task = data.find((item: Task) => item.id === id);
+  if (!task) throw new NotFoundError("Item not found");
   const newData = data.filter((item: Task) => item.id !== id);
-  if (!newData.length) throw new NotFoundError("Item not found");
   await saveTasks(newData);
   return { id: id };
 }
@@ -67,7 +67,11 @@ async function main() {
     }
     console.log(result);
   } catch (err: unknown) {
-    // console.error(`${err.name}: ${err.message}`);
+    if (err instanceof Error) {
+      console.error(`${err.name}: ${err.message}`);
+    } else {
+      console.error("Unknown error:", err);
+    }
   }
 }
 
