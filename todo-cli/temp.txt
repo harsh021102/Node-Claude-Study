@@ -1,0 +1,31 @@
+Here's the full picture of where we are:
+
+Stage 1: Node.js Fundamentals — ✅ Complete
+
+Lessons covered (7):
+
+What Node.js is & why it exists — single-threaded JS + delegated I/O via libuv, solving the thread-per-connection problem
+The Module System (CommonJS) — require/module.exports, the module wrapper function, caching behavior
+npm — package.json, dependencies vs devDependencies, semver (^/~), why package-lock.json matters
+The Event Loop (deep dive, your flagged weak spot) — call stack, process.nextTick → microtask queue (fully drained) → macrotask queue, priority ordering
+Promises & async/await — states, await as sugar over .then(), common pitfalls (unhandled rejections, unnecessary sequential awaits)
+File System & Environment Variables — fs/promises, sync vs async fs risks, process.env always being strings
+Error Handling — try/catch boundaries, why callback-style errors can't be caught by try/catch, custom error classes (extends Error, super(), instanceof)
+
+Project — CLI Task Manager (TypeScript): built index.ts, taskStore.ts, errors.ts. Went through real debugging together: .filter() returning an array instead of a single item, .map() returning booleans instead of Task objects, silently-swallowed errors in catch blocks, unknown-typed err needing instanceof Error narrowing, and a module-resolution error from a missing/misnamed file. All four commands (add/list/complete/remove) are now working correctly with proper ValidationError/NotFoundError handling.
+
+Stage 2: Express Fundamentals — 🔄 In progress
+
+Lessons covered so far (3):
+
+What Express Is & Why It Exists — wraps Node's http module, routing table matched in registration order, why unsent responses hang
+Middleware — (req, res, next) signature, the middleware stack, app.use() scope (global vs per-route), 4-parameter error-handling middleware
+Request & Response Lifecycle — req.params vs req.query vs req.body, status code conventions (200/201/400/404/500), res as a writable stream (one response per request)
+
+Remaining before the Stage 2 project:
+
+CRUD APIs (tying routing + middleware + req/response together into a full resource)
+Validation Basics
+Error Handling (Express-specific — the error middleware pattern, applied)
+
+Stage 2 project (once those are done): Notes API
