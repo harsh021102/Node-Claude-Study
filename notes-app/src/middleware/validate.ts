@@ -30,6 +30,7 @@ export function validateQuery<T>(schema: ZodType<T>): RequestHandler {
       res
         .status(400)
         .json({ error: "Invalid query", details: formatIssues(result.error) });
+      return;
     }
     res.locals.query = result.data;
     next();

@@ -32,18 +32,7 @@ notesRouter.get("/:id", (req, res) => {
 
 notesRouter.post("/", validateBody(createNoteSchema), (req, res) => {
   const { title, body } = req.body as CreateNoteInput;
-  // if (typeof title !== "string" || title.trim() === "") {
-  //   res.status(400).send({
-  //     error: "title is required and must be a non-empty string",
-  //   });
-  //   return;
-  // }
-  // if (body !== undefined && typeof body !== "string") {
-  //   res.status(400).send({
-  //     error: "body must be a string",
-  //   });
-  //   return;
-  // }
+
   const now = new Date().toISOString();
   const note: Note = {
     id: crypto.randomUUID(),
