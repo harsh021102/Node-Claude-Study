@@ -7,9 +7,9 @@ export async function loadTasks() {
   } catch (err: any) {
     if (err.code === "ENOENT") {
       return [];
-      throw err;
       //   console.log("Invalid task");
     }
+    throw err;
   }
 }
 

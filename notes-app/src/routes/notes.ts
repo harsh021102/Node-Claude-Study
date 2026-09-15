@@ -1,10 +1,12 @@
 import { Router } from "express";
 import { findAll, save, remove, findById } from "../store.js";
-import { validateBody } from "../middleware/validate.js";
+import { validateBody, validateQuery } from "../middleware/validate.js";
 import {
   createNoteSchema,
+  listQuerySchema,
   updateNoteSchema,
   type CreateNoteInput,
+  type ListQuery,
   type UpdateNoteInput,
 } from "../schemas/note.js";
 import type { Note } from "../types.js";
@@ -13,8 +15,36 @@ export const notesRouter = Router();
 // import crypto from "crypto";
 // notesRouter.get("/test", (req, res) => res.send("Server is in good health"));
 
-notesRouter.get("/", (req, res) => {
-  res.status(200).json(findAll());
+notesRouter.get("/", validateQuery(listQuerySchema), (req, res) => {
+  const { search, page, limit, sort, order } = res.locals.query as ListQuery;
+  const allNotes: Note[] = findAll();
+  let filteredNotes = allNotes;
+  if (search) {
+    const searchTerm = String(search).toLowerCase();
+    filteredNotes = filteredNotes.filter((note) => {
+      const titleMatch = note.title?.toLowerCase().includes(searchTerm);
+      const bodyMatch = note.body?.toLowerCase().includes(searchTerm);
+      return titleMatch || bodyMatch;
+    });
+  }
+  filteredNotes = filteredNotes.sort((a, b) => {
+    const cmp = a[sort].localeCompare(b[sort]);
+    return order === "asc" ? cmp : -cmp;
+  });
+  const total = allNotes.length;
+  const offset = (page - 1) * limit;
+  const paginatedNotes = filteredNotes.slice(offset, offset + limit);
+  res.status(200).json({
+    metadata: {
+      page: page,
+      limit: limit,
+      // Use the length of the FILTERED array, not the total files array
+      totalItems: filteredNotes.length,
+      totalPages: Math.ceil(filteredNotes.length / limit),
+      searchTerm: search || null,
+    },
+    data: paginatedNotes,
+  });
 });
 
 // notesRouter.get("/boom", async (req, res) => {

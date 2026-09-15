@@ -12,9 +12,9 @@ export const notFoundHandler: RequestHandler = (req, res) => {
     },
   });
 };
-
+// export const corruptFileError:RequestHandler = ()
 export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-  console.log("3. errorHandler ran:", err?.constructor?.name);
+  // console.log("3. errorHandler ran:", err?.constructor?.name);
 
   if (res.headersSent) {
     next(err);
