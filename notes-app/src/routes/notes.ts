@@ -8,6 +8,7 @@ import {
   type UpdateNoteInput,
 } from "../schemas/note.js";
 import type { Note } from "../types.js";
+import { NotFoundError } from "../errors.js";
 export const notesRouter = Router();
 // import crypto from "crypto";
 // notesRouter.get("/test", (req, res) => res.send("Server is in good health"));
@@ -16,16 +17,14 @@ notesRouter.get("/", (req, res) => {
   res.status(200).json(findAll());
 });
 
+// notesRouter.get("/boom", async (req, res) => {
+//   throw new Error("Simulated database failure");
+// });
+
 notesRouter.get("/:id", (req, res) => {
-  const id = req.params.id;
-  if (typeof id !== "string") {
-    res.status(404).send({ error: "Note not found" });
-    return;
-  }
-  const note = findById(id);
+  const note = findById(req.params.id);
   if (!note) {
-    res.status(404).send({ error: "Note not found" });
-    return;
+    throw new NotFoundError("Note");
   }
   res.json(note);
 });
@@ -64,15 +63,9 @@ notesRouter.patch("/:id", validateBody(updateNoteSchema), (req, res) => {
   res.send(updated);
 });
 notesRouter.delete("/:id", (req, res) => {
-  const id = req.params.id;
-  if (typeof id !== "string") {
-    res.status(404).send({ error: "Note not found" });
-    return;
-  }
-  const deleted = remove(id);
+  const deleted = remove(req.params.id);
   if (!deleted) {
-    res.status(404).send({ error: "Note not found" });
-    return;
+    throw new NotFoundError("Note");
   }
   res.status(204).end();
 });

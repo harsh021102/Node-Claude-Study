@@ -11,15 +11,7 @@ function formatIssues(error: {
 }
 export function validateBody<T>(schema: ZodType<T>): RequestHandler {
   return (req, res, next) => {
-    const result = schema.safeParse(req.body);
-    if (!result.success) {
-      res.status(400).json({
-        error: "Validation failed",
-        details: formatIssues(result.error),
-      });
-      return;
-    }
-    req.body = result.data;
+    req.body = schema.parse(req.body);
     next();
   };
 }
