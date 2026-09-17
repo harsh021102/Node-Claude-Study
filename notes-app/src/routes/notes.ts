@@ -31,7 +31,7 @@ notesRouter.get("/", validateQuery(listQuerySchema), (req, res) => {
     const cmp = a[sort].localeCompare(b[sort]);
     return order === "asc" ? cmp : -cmp;
   });
-  const total = allNotes.length;
+
   const offset = (page - 1) * limit;
   const paginatedNotes = filteredNotes.slice(offset, offset + limit);
   res.status(200).json({
@@ -87,6 +87,36 @@ notesRouter.patch("/:id", validateBody(updateNoteSchema), (req, res) => {
   const updated: Note = {
     ...note,
     ...(req.body as UpdateNoteInput),
+    updatedAt: new Date().toISOString(),
+  };
+  save(updated);
+  res.send(updated);
+});
+notesRouter.put("/:id", validateBody(updateNoteSchema), (req, res) => {
+  const id = req.params.id;
+  if (typeof id !== "string") {
+    res.status(400).send({ error: "Invalid Id" });
+    return;
+  }
+  const note = findById(id);
+  if (!note) {
+    res.status(404).send({ error: "Note not found" });
+    return;
+  }
+  const payload = req.body as UpdateNoteInput;
+
+  const updated: Note = {
+    // 1. Keep immutable properties from the existing note
+    id: note.id,
+    createdAt: note.createdAt,
+
+    // 2. Apply all fields from the payload.
+    // If a field is omitted, this will set it to undefined (resetting it).
+    // Note: Add any other editable fields you have in your schema here.
+    title: payload.title,
+    body: payload.body,
+
+    // 3. Update the modification timestamp
     updatedAt: new Date().toISOString(),
   };
   save(updated);

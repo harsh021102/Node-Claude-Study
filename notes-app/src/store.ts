@@ -23,7 +23,10 @@ export async function load(): Promise<void> {
   try {
     raw = await readFile(config.DATA_FILE, "utf-8");
   } catch (error) {
-    if (isNodeError(error) && error.code === "ENOENT") return;
+    if (isNodeError(error) && error.code === "ENOENT") {
+      await writeFile(config.DATA_FILE, "[]", "utf-8");
+      return;
+    }
     throw error;
   }
 
@@ -72,9 +75,10 @@ export async function remove(id: string) {
 }
 
 async function persist(): Promise<void> {
+  const dataToSave = Array.from(notes.values());
   await writeFile(
     config.DATA_FILE,
-    JSON.stringify([...notes], null, 2),
+    JSON.stringify(dataToSave, null, 2),
     "utf-8",
   );
 }
